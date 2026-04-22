@@ -75,7 +75,8 @@ export default function ElectionCenterPage() {
     mutationFn: ({ id, status }: { id: string; status: string }) =>
       adminService.updateElectionStatus(id, status),
     onSuccess: (_, variables) => {
-      toast.success(`Election is now ${variables.status.toLowerCase()}`);
+      toast.success(`Election status updated to ${variables.status}`);
+      // Invalidate everything election-related so all tabs refresh
       queryClient.invalidateQueries({ queryKey: ['admin', 'elections'] });
     },
     onError: (err: any) => toast.error('Failed to update status: ' + err.message),
@@ -125,22 +126,6 @@ export default function ElectionCenterPage() {
     });
   };
 
-  const testElectionApi = async () => {
-    try {
-      const res = await api.get<{ elections: any[]; total: number }>('/elections', {
-        params: { status: 'all' },
-      });
-      const electionsList = (res as any).data?.elections ?? (res as any).elections ?? res.data;
-      if (Array.isArray(electionsList)) {
-        toast.success(`Election API connected! Found ${electionsList.length} elections.`);
-      } else {
-        toast.warning("API connected but didn't return an array of elections.");
-      }
-    } catch (err: any) {
-      toast.error(`API Error: ${err.message}`);
-    }
-  };
-
   if (loadingElections && elections.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
@@ -173,22 +158,6 @@ export default function ElectionCenterPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={testElectionApi}
-            className="bg-amber-50 dark:bg-amber-500/10 rounded-full border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors"
-          >
-            <span className="material-symbols-rounded mr-2 text-[18px]">bug_report</span> Test API
-          </Button>
-          <Button
-            variant="outline"
-            className="bg-background rounded-full shadow-sm border-border hover:bg-muted transition-colors"
-          >
-            <span className="material-symbols-rounded mr-2 text-[18px] text-emerald-500">
-              verified_user
-            </span>{' '}
-            Audit Logs
-          </Button>
           <CreateElectionDialog
             onElectionCreated={() =>
               queryClient.invalidateQueries({ queryKey: ['admin', 'elections'] })
@@ -546,8 +515,7 @@ export default function ElectionCenterPage() {
                               Results Breakdown
                             </h5>
                             {resultsData.positions[0].results.map((r: any, i: number) => {
-                              const total = resultsData.totalVotes || 1;
-                              const pct = Math.round((r.votes / total) * 100);
+                              const pct = r.percentage ?? Math.round((r.votes / (resultsData.totalVotes || 1)) * 100);
                               return (
                                 <div key={r.candidateId || i} className="flex items-center gap-4">
                                   <div className="w-32 text-sm font-bold text-foreground truncate">
@@ -555,8 +523,8 @@ export default function ElectionCenterPage() {
                                   </div>
                                   <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
                                     <div
-                                      className="h-full bg-primary rounded-full transition-all duration-700 bar-fill-dynamic"
-                                      style={{ '--bar-pct': `${pct}%` } as React.CSSProperties}
+                                      className="h-full bg-primary rounded-full transition-all duration-700"
+                                      style={{ width: `${Math.min(100, pct)}%` }}
                                     />
                                   </div>
                                   <div className="w-20 text-right text-sm font-black text-foreground">
@@ -615,15 +583,10 @@ export default function ElectionCenterPage() {
                             </CardHeader>
                             <CardContent>
                               <p className="text-xs text-muted-foreground italic">
-                                Detailed per-candidate result breakdown is available after the
-                                election ends or via the "Live Results" view for admins.
+                                {activeElection.status === 'ACTIVE'
+                                  ? 'Live results are hidden during an active election to prevent influencing remaining voters.'
+                                  : 'Detailed per-candidate result breakdown is shown in the Results Breakdown above once votes are available.'}
                               </p>
-                              <Button
-                                variant="link"
-                                className="text-primary p-0 h-auto mt-4 font-bold"
-                              >
-                                Open Full Real-time Analytics &rarr;
-                              </Button>
                             </CardContent>
                           </Card>
                         </div>
@@ -742,18 +705,10 @@ export default function ElectionCenterPage() {
               </p>
               <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden mb-4">
                 <div
-                  className="h-full bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-1000 bar-fill-dynamic-white"
-                  style={
-                    { '--bar-pct': `${analytics?.averageTurnout || 0}%` } as React.CSSProperties
-                  }
+                  className="h-full bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-1000"
+                  style={{ width: `${Math.min(100, analytics?.averageTurnout || 0)}%` }}
                 />
               </div>
-              <Button
-                variant="secondary"
-                className="w-full bg-white/10 hover:bg-white/20 border-white/20 text-white rounded-full font-bold text-xs h-9"
-              >
-                Download Global Report
-              </Button>
             </CardContent>
           </Card>
         </div>

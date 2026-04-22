@@ -66,6 +66,7 @@ export function CreateElectionDialog({ onElectionCreated }: { onElectionCreated:
   const [searching, setSearching] = useState(false);
   const [branches, setBranches] = useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -168,8 +169,26 @@ export function CreateElectionDialog({ onElectionCreated }: { onElectionCreated:
   };
 
   const handleSubmit = async () => {
-    if (!formData.title || !formData.votingStartDate || !formData.votingEndDate || !formData.electionType) {
-      toast.error("Please fill in all required fields");
+    if (!formData.title.trim()) {
+      toast.error("Election title is required");
+      return;
+    }
+    if (!formData.electionType) {
+      toast.error("Please select an election category");
+      return;
+    }
+    if (!formData.votingStartDate || !formData.votingEndDate) {
+      toast.error("Start and end dates are required");
+      return;
+    }
+    const start = new Date(formData.votingStartDate);
+    const end = new Date(formData.votingEndDate);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      toast.error("Invalid date format — please re-select dates");
+      return;
+    }
+    if (end <= start) {
+      toast.error("End date must be after start date");
       return;
     }
 
@@ -182,9 +201,10 @@ export function CreateElectionDialog({ onElectionCreated }: { onElectionCreated:
         candidates: candidates.map((c, i) => ({
           userId: c.userId,
           candidateType: c.candidateType,
-          manifesto: c.manifesto,
-          displayOrder: i
-        }))
+          // Store null instead of empty string for absent manifestos
+          manifesto: c.manifesto?.trim() || undefined,
+          displayOrder: i,
+        })),
       });
       toast.success("Election created successfully!");
       setOpen(false);
@@ -431,11 +451,13 @@ export function CreateElectionDialog({ onElectionCreated }: { onElectionCreated:
                   <Label className="text-sm font-bold text-muted-foreground mb-3 block ml-1 uppercase tracking-wider">Add Contestants</Label>
                   <div className="relative group">
                     <span className="material-symbols-rounded absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">person_search</span>
-                    <Input 
-                      placeholder="Search students by name, email or ID..." 
+                    <Input
+                      placeholder="Search students by name, email or ID..."
                       className="pl-12 rounded-2xl border-input bg-background h-14 shadow-sm focus:ring-primary/10 transition-all"
                       value={searchTerm}
-                      onChange={e => setSearchTerm(e.target.value)}
+                      onChange={e => { setSearchTerm(e.target.value); setShowSearchResults(true); }}
+                      onFocus={() => setShowSearchResults(true)}
+                      onBlur={() => setTimeout(() => setShowSearchResults(false), 150)}
                     />
                     {searching && (
                       <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -443,15 +465,16 @@ export function CreateElectionDialog({ onElectionCreated }: { onElectionCreated:
                       </div>
                     )}
                   </div>
-                  
-                  {searchResults.length > 0 && (
+
+                  {showSearchResults && searchResults.length > 0 && (
                     <Card className="absolute top-full left-0 right-0 z-50 mt-2 shadow-2xl border-border rounded-[28px] overflow-hidden bg-card/95 backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="p-2 space-y-1 max-h-[300px] overflow-y-auto">
                         {searchResults.filter(user => !candidates.find(c => c.userId === user.id)).map(user => (
-                          <div 
-                            key={user.id} 
+                          <div
+                            key={user.id}
                             className="flex items-center gap-4 p-3 hover:bg-primary/10 rounded-[20px] cursor-pointer transition-all group/item"
-                            onClick={() => addCandidate(user)}
+                            onMouseDown={e => e.preventDefault()}
+                            onClick={() => { addCandidate(user); setShowSearchResults(false); }}
                           >
                             <Avatar className="h-10 w-10 ring-2 ring-background shadow-sm transition-transform group-hover/item:scale-105">
                               <AvatarImage src={user.avatar || user.profilePicture || user.imageUrl} />
@@ -555,8 +578,16 @@ export function CreateElectionDialog({ onElectionCreated }: { onElectionCreated:
               Cancel
             </Button>
             {step === 1 ? (
-              <Button 
-                onClick={() => setStep(2)} 
+              <Button
+                onClick={() => {
+                  if (!formData.title.trim()) { toast.error("Election title is required"); return; }
+                  if (!formData.electionType) { toast.error("Please select an election category"); return; }
+                  if (!formData.votingStartDate || !formData.votingEndDate) { toast.error("Start and end dates are required"); return; }
+                  const s = new Date(formData.votingStartDate), e = new Date(formData.votingEndDate);
+                  if (isNaN(s.getTime()) || isNaN(e.getTime())) { toast.error("Invalid date — please re-select"); return; }
+                  if (e <= s) { toast.error("End date must be after start date"); return; }
+                  setStep(2);
+                }}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-10 h-12 font-bold shadow-lg shadow-primary/20"
               >
                 Continue <span className="material-symbols-rounded ml-2 text-[20px]">arrow_forward</span>
