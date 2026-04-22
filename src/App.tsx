@@ -17,6 +17,7 @@ import NetworkManagementPage from '@/pages/admin/identity/network/page';
 import DigitalIdManagementPage from '@/pages/admin/identity/digital-id/page';
 import AcademicManagerPage from "@/pages/admin/academic/manager/page";
 import ElectionCenterPage from "@/pages/admin/governance/elections/page";
+import VotingCenterPage from "@/pages/user/voting/page";
 import ModerationQueuePage from "@/pages/admin/safety/moderation/page";
 import KillSwitchPage from "@/pages/admin/system/kill-switch/page";
 import PlaceholderPage from "@/pages/PlaceholderPage";
@@ -234,6 +235,7 @@ export default function App() {
               {/* Organizations & Elections */}
               <Route path="admin/governance/clubs" element={<PlaceholderPage title="Clubs & Guilds" description="Approve new student organizations, manage budgets, and oversee faculty advisors." />} />
               <Route path="admin/governance/elections" element={<ElectionCenterPage />} />
+              <Route path="user/voting" element={<VotingCenterPage />} />
 
               {/* Moderation & Safety */}
               <Route path="admin/safety/moderation" element={<ModerationQueuePage />} />

@@ -14,9 +14,44 @@ export default function VotingCenterPage() {
   const queryClient = useQueryClient();
   const api = useApiClient();
   const adminService = useAdminService(api);
-  const { user } = useUser();
-  
+  useUser();
+
   const [selectedElectionId, setSelectedElectionId] = useState<string | null>(null);
+  const [regStudentId, setRegStudentId] = useState('');
+  const [regFaculty, setRegFaculty] = useState('');
+  const [regYear, setRegYear] = useState('1');
+
+  // Check voter registration status
+  const { data: registrationStatus, isLoading: checkingRegistration } = useQuery({
+    queryKey: ['voting', 'registration'],
+    queryFn: async () => {
+      const res = await api.get('/elections/registration');
+      return (res as any).data ?? res;
+    },
+    retry: false,
+  });
+
+  // Register user as voter
+  const registerMutation = useMutation({
+    mutationFn: async () => {
+      if (!regStudentId.trim() || !regFaculty.trim()) {
+        throw new Error('Student ID and faculty are required');
+      }
+      return await api.post('/elections/register', {
+        studentId: regStudentId.trim(),
+        faculty: regFaculty.trim(),
+        yearOfStudy: parseInt(regYear, 10) || 1,
+        biometricEnabled: false,
+      });
+    },
+    onSuccess: () => {
+      toast.success('Successfully registered as a voter!');
+      queryClient.invalidateQueries({ queryKey: ['voting', 'registration'] });
+    },
+    onError: (err: any) => {
+      toast.error('Registration failed: ' + err.message);
+    },
+  });
 
   // Elections Query
   const { data: elections = [], isLoading } = useQuery({
@@ -30,11 +65,11 @@ export default function VotingCenterPage() {
   const selectedElection = elections.find((e: any) => e.id === selectedElectionId);
 
   const castVoteMutation = useMutation({
-    mutationFn: async ({ electionId, candidateId }: { electionId: string, candidateId: string }) => {
+    mutationFn: async ({ electionId, positionId, candidateId }: { electionId: string, positionId: string, candidateId: string }) => {
       return await api.post('/elections/vote', {
         electionId,
         selections: [{
-          positionId: 'primary', // Default position/category
+          positionId,
           candidateIds: [candidateId]
         }]
       });
@@ -51,11 +86,60 @@ export default function VotingCenterPage() {
     }
   });
 
-  if (isLoading) {
+  const isRegistered = registrationStatus?.isRegistered === true;
+
+  if (isLoading || checkingRegistration) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <p className="text-muted-foreground font-medium">Loading Active Elections...</p>
+        <p className="text-muted-foreground font-medium">Loading Voting Center...</p>
+      </div>
+    );
+  }
+
+  if (!isRegistered) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[500px] space-y-6">
+        <span className="material-symbols-rounded text-6xl text-muted-foreground/30">how_to_vote</span>
+        <div className="text-center">
+          <h3 className="text-xl font-bold text-foreground mb-2">Voter Registration Required</h3>
+          <p className="text-muted-foreground text-sm max-w-sm">
+            Complete your voter registration to participate in elections.
+          </p>
+        </div>
+        <div className="w-full max-w-sm space-y-3">
+          <input
+            type="text"
+            placeholder="Student ID (e.g. STU-2024-001)"
+            value={regStudentId}
+            onChange={e => setRegStudentId(e.target.value)}
+            className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+          <input
+            type="text"
+            placeholder="Faculty / Department (e.g. Engineering)"
+            value={regFaculty}
+            onChange={e => setRegFaculty(e.target.value)}
+            className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+          <select
+            title="Year of study"
+            value={regYear}
+            onChange={e => setRegYear(e.target.value)}
+            className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          >
+            {[1, 2, 3, 4, 5].map(y => (
+              <option key={y} value={y}>Year {y}</option>
+            ))}
+          </select>
+          <Button
+            onClick={() => registerMutation.mutate()}
+            disabled={registerMutation.isPending || !regStudentId.trim() || !regFaculty.trim()}
+            className="w-full rounded-full bg-primary text-primary-foreground font-bold"
+          >
+            {registerMutation.isPending ? "Registering..." : "Register as Voter"}
+          </Button>
+        </div>
       </div>
     );
   }
@@ -132,7 +216,7 @@ export default function VotingCenterPage() {
             </CardHeader>
             <CardContent className="p-6 overflow-y-auto max-h-[70vh]">
               <div className="grid gap-4 sm:grid-cols-2">
-                {selectedElection.candidates?.map((candidate: any) => (
+                {(selectedElection.positions?.[0]?.candidates ?? []).map((candidate: any) => (
                   <div key={candidate.id} className="relative group">
                     <div className="p-4 bg-muted/20 border border-border rounded-2xl hover:border-primary/50 transition-all">
                       <div className="flex items-center gap-4 mb-3">
@@ -141,20 +225,20 @@ export default function VotingCenterPage() {
                             <img src={candidate.photo} alt={candidate.name} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-muted-foreground font-bold text-lg">
-                              {candidate.name.charAt(0)}
+                              {(candidate.name || '?').charAt(0)}
                             </div>
                           )}
                         </div>
                         <div>
-                          <h5 className="font-bold text-foreground">{candidate.name}</h5>
+                          <h5 className="font-bold text-foreground">{candidate.name || candidate.optionText || 'Unknown'}</h5>
                           <p className="text-[10px] text-muted-foreground font-medium uppercase">Official Candidate</p>
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground line-clamp-2 italic mb-4">
                         "{candidate.manifesto || "No manifesto available."}"
                       </p>
-                      <Button 
-                        onClick={() => castVoteMutation.mutate({ electionId: selectedElection.id, candidateId: candidate.id })}
+                      <Button
+                        onClick={() => castVoteMutation.mutate({ electionId: selectedElection.id, positionId: selectedElection.positions[0].id, candidateId: candidate.id })}
                         disabled={castVoteMutation.isPending}
                         className="w-full rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground border-none font-bold text-xs"
                       >

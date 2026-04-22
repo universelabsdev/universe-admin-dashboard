@@ -45,6 +45,7 @@ const navigationGroups = [
     title: "Governance",
     items: [
       { name: "Election Center", href: "/admin/governance/elections", icon: "ballot", roles: ["admin"] },
+      { name: "Voting Center", href: "/user/voting", icon: "how_to_vote", roles: ["admin"] },
       { name: "Clubs & Guilds", href: "/admin/governance/clubs", icon: "diversity_3", roles: ["admin"] },
     ],
   },
