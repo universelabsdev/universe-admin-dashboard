@@ -489,7 +489,7 @@ export default function ElectionCenterPage() {
               <div className="text-center">
                 <span className="material-symbols-rounded text-6xl text-muted-foreground/30 mb-6 block">how_to_vote</span>
                 <p className="text-muted-foreground font-bold text-lg">No elections found in your jurisdiction</p>
-                <Button className="mt-6 rounded-full px-8 bg-primary hover:bg-primary/90 text-primary-foreground">Create First Election</Button>
+                <CreateElectionDialog onElectionCreated={() => queryClient.invalidateQueries({ queryKey: ['admin', 'elections'] })} />
               </div>
             </Card>
           )}
