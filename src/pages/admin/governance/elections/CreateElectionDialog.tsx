@@ -18,7 +18,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  NativeSelect
 } from "../../../../components/ui/select";
 import { Switch } from "../../../../components/ui/switch";
 import { useAdminService } from "../../../../services/admin.service";

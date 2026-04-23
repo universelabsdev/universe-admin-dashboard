@@ -1,26 +1,48 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useApiClient } from "@/lib/api-client";
-import { useAdminService } from "@/services/admin.service";
+import * as React from "react"
+import { useEffect, useState, useMemo } from "react"
+import { Link } from "react-router-dom"
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend
-} from "recharts";
-import { Loader2 } from "lucide-react";
+  Activity,
+  ArrowUpRight,
+  CircleUser,
+  CreditCard,
+  DollarSign,
+  Menu,
+  Package2,
+  Search,
+  Users,
+  School,
+  Gavel,
+  ShieldCheck,
+  TrendingUp,
+  Loader2
+} from "lucide-react"
 
-// Google Colors: Blue, Green, Yellow, Red
-const COLORS = ["#1a73e8", "#34a853", "#fbbc04", "#ea4335", "#8b5cf6", "#ec4899"];
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { useApiClient } from "@/lib/api-client"
+import { useAdminService } from "@/services/admin.service"
+import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 
 export default function Dashboard() {
   const api = useApiClient();
@@ -40,39 +62,26 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      console.log("[Dashboard] Initializing data fetch...");
       try {
-        console.log("[Dashboard] Requesting stats, growth, roles, and activity...");
         const [statsRes, growthRes, rolesRes, activityRes] = await Promise.all([
           adminService.getDashboardStats(),
           adminService.getDashboardGrowth(),
           adminService.getDashboardRoles(),
           adminService.getDashboardActivity()
         ]);
-        console.log("[Dashboard] All requests completed:", { statsRes, growthRes, rolesRes, activityRes });
 
-        if (statsRes.success) {
-           setStats(statsRes.data);
-        }
-        if (growthRes.success) {
-           setUserGrowthData(Array.isArray(growthRes.data) ? growthRes.data : []);
-        }
-        if (rolesRes.success) {
-           setRoleDistributionData(Array.isArray(rolesRes.data) ? rolesRes.data : []);
-        }
-        if (activityRes.success) {
-           setRecentActivity(Array.isArray(activityRes.data) ? activityRes.data : []);
-        }
+        if (statsRes.success) setStats(statsRes.data);
+        if (growthRes.success) setUserGrowthData(Array.isArray(growthRes.data) ? growthRes.data : []);
+        if (rolesRes.success) setRoleDistributionData(Array.isArray(rolesRes.data) ? rolesRes.data : []);
+        if (activityRes.success) setRecentActivity(Array.isArray(activityRes.data) ? activityRes.data : []);
       } catch (error) {
-        console.error("[Dashboard] FATAL Error fetching data:", error);
+        console.error("[Dashboard] Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboardData();
-    
-    // Refresh data every 30 seconds
     const interval = setInterval(fetchDashboardData, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -81,226 +90,208 @@ export default function Dashboard() {
     return (
       <div className="flex h-[60vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-lg font-medium">Loading Command Center...</span>
+        <span className="ml-2 text-lg font-medium">Synchronizing Systems...</span>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <Card className="bg-primary/10 border-primary/20 shadow-none">
-        <CardContent className="p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-              <span className="material-symbols-rounded text-primary text-[24px]">person_add</span>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-foreground">Welcome to UniVerse!</h3>
-              <p className="text-muted-foreground">Complete your profile to get the most out of the platform.</p>
-            </div>
-          </div>
-          <Link to="/onboarding">
-            <Button className="rounded-full px-6">Complete Profile</Button>
-          </Link>
-        </CardContent>
-      </Card>
-
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-[28px] font-medium tracking-tight text-foreground font-heading">
-            Command Center
-          </h2>
-          <p className="text-muted-foreground mt-1 text-[15px]">
-            Real-time overview of the UniVerse platform.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" className="bg-card rounded-full shadow-sm border-border text-primary hover:bg-muted hover:text-primary h-10 px-5 font-medium">
-            <span className="material-symbols-rounded mr-2 text-[20px]">dns</span> System Status
-          </Button>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-none h-10 px-5 font-medium">
-            <span className="material-symbols-rounded mr-2 text-[20px]">bolt</span> Generate Report
-          </Button>
-        </div>
+    <div className="flex flex-col gap-8">
+      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Platform Users
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">
+              +12.1% from last month
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Active Students
+            </CardTitle>
+            <School className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.activeStudents.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">
+              +5% from last semester
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm border-amber-100 bg-amber-50/30">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Safety Queue
+            </CardTitle>
+            <Gavel className="h-4 w-4 text-amber-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-700">{stats.reportsPending} Pending</div>
+            <p className="text-xs text-muted-foreground">
+              Requires immediate review
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              System Health
+            </CardTitle>
+            <Activity className="h-4 w-4 text-emerald-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.serverHealth}%</div>
+            <p className="text-xs text-muted-foreground">
+              All clusters operational
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="premium-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="material-symbols-rounded text-primary text-[24px]">group</span>
+      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="lg:col-span-1 xl:col-span-2 space-y-8">
+           <ChartAreaInteractive data={userGrowthData} />
+           
+           <Card className="shadow-sm">
+            <CardHeader className="flex flex-row items-center">
+              <div className="grid gap-2">
+                <CardTitle>Recent Platform Activity</CardTitle>
+                <CardDescription>
+                  Real-time events from across the UniVerse.
+                </CardDescription>
               </div>
-              <div className="flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
-                <span className="material-symbols-rounded text-[16px] mr-1">trending_up</span>
-                +12%
-              </div>
-            </div>
-            <div className="mt-5">
-              <p className="text-[14px] font-medium text-muted-foreground">Total Users</p>
-              <h3 className="text-[32px] font-medium text-foreground mt-1 tracking-tight font-heading">{stats.totalUsers.toLocaleString()}</h3>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="premium-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <span className="material-symbols-rounded text-emerald-600 dark:text-emerald-400 text-[24px]">school</span>
-              </div>
-              <div className="flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
-                <span className="material-symbols-rounded text-[16px] mr-1">trending_up</span>
-                +5%
-              </div>
-            </div>
-            <div className="mt-5">
-              <p className="text-[14px] font-medium text-muted-foreground">Active Students</p>
-              <h3 className="text-[32px] font-medium text-foreground mt-1 tracking-tight font-heading">{stats.activeStudents.toLocaleString()}</h3>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Link to="/admin/safety/moderation" className="block transition-transform hover:scale-[1.02] active:scale-[0.98]">
-          <Card className="premium-card h-full">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">
-                  <span className="material-symbols-rounded text-amber-600 dark:text-amber-400 text-[24px]">gavel</span>
-                </div>
-                <div className="flex items-center text-sm font-medium text-destructive bg-destructive/10 px-2.5 py-1 rounded-full">
-                  Action Required
-                </div>
-              </div>
-              <div className="mt-5">
-                <p className="text-[14px] font-medium text-muted-foreground">Safety Queue</p>
-                <h3 className="text-[32px] font-medium text-foreground mt-1 tracking-tight font-heading">{stats.reportsPending} Pending</h3>
-              </div>
+              <Button asChild size="sm" className="ml-auto gap-1">
+                <Link to="#">
+                  View All
+                  <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead className="hidden sm:table-cell">Type</TableHead>
+                    <TableHead className="hidden sm:table-cell">Status</TableHead>
+                    <TableHead className="hidden md:table-cell">Date</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentActivity.map((activity) => (
+                    <TableRow key={activity.id}>
+                      <TableCell>
+                        <div className="font-medium">{activity.user}</div>
+                        <div className="hidden text-sm text-muted-foreground md:inline">
+                          {activity.action}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        {activity.type === 'success' ? 'System' : 'User'}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <Badge className="text-xs" variant={activity.type === 'success' ? 'outline' : 'secondary'}>
+                          {activity.type === 'success' ? 'Verified' : 'Flagged'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {activity.time}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        <Button variant="ghost" size="sm">Details</Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
-        </Link>
+        </div>
 
-        <Card className="premium-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="material-symbols-rounded text-primary text-[24px]">dns</span>
+        <Card className="shadow-sm h-fit">
+          <CardHeader>
+            <CardTitle>Security Status</CardTitle>
+            <CardDescription>
+              Overview of system access and integrity.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-8">
+            <div className="flex items-center gap-4">
+              <Avatar className="hidden h-9 w-9 sm:flex">
+                <AvatarFallback className="bg-primary/10 text-primary">SC</AvatarFallback>
+              </Avatar>
+              <div className="grid gap-1">
+                <p className="text-sm font-medium leading-none">
+                  SSL/TLS Encryption
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Active (Version 1.3)
+                </p>
               </div>
-              <div className="flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
-                <span className="material-symbols-rounded text-[16px] mr-1">check_circle</span>
-                Stable
+              <div className="ml-auto font-medium text-emerald-500 flex items-center">
+                <ShieldCheck className="h-4 w-4 mr-1" />
+                Secure
               </div>
             </div>
-            <div className="mt-5">
-              <p className="text-[14px] font-medium text-muted-foreground">Server Health</p>
-              <h3 className="text-[32px] font-medium text-foreground mt-1 tracking-tight font-heading">{stats.serverHealth}%</h3>
+            <div className="flex items-center gap-4">
+              <Avatar className="hidden h-9 w-9 sm:flex">
+                <AvatarFallback className="bg-primary/10 text-primary">DB</AvatarFallback>
+              </Avatar>
+              <div className="grid gap-1">
+                <p className="text-sm font-medium leading-none">
+                  Database Backups
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Last: 12 minutes ago
+                </p>
+              </div>
+              <div className="ml-auto font-medium text-emerald-500 flex items-center">
+                <ShieldCheck className="h-4 w-4 mr-1" />
+                Valid
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <Avatar className="hidden h-9 w-9 sm:flex">
+                <AvatarFallback className="bg-primary/10 text-primary">AU</AvatarFallback>
+              </Avatar>
+              <div className="grid gap-1">
+                <p className="text-sm font-medium leading-none">
+                  Auth Latency
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Global average
+                </p>
+              </div>
+              <div className="ml-auto font-medium">
+                42ms
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div className="space-y-4">
+              <h4 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">System Alerts</h4>
+              <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                <p className="text-sm font-medium">No critical issues detected in the last 24 hours.</p>
+              </div>
+              <Button variant="outline" className="w-full rounded-xl">Run Security Audit</Button>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* Charts */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="premium-card lg:col-span-4">
-          <CardHeader className="border-b border-border pb-4">
-            <CardTitle className="text-[18px] font-medium flex items-center text-foreground font-heading">
-              <span className="material-symbols-rounded mr-2 text-[22px] text-primary">monitoring</span> User Growth
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={userGrowthData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={13} tickLine={false} axisLine={false} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={13} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "hsl(var(--card))", borderRadius: "12px", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)" }}
-                  />
-                  <Line type="monotone" dataKey="users" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "hsl(var(--background))" }} activeDot={{ r: 6, strokeWidth: 0 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="premium-card lg:col-span-3">
-          <CardHeader className="border-b border-border pb-4">
-            <CardTitle className="text-[18px] font-medium flex items-center text-foreground font-heading">
-              <span className="material-symbols-rounded mr-2 text-[22px] text-emerald-500">pie_chart</span> Role Distribution
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={roleDistributionData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={100}
-                    paddingAngle={2}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {roleDistributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "hsl(var(--card))", borderRadius: "12px", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)" }}
-                  />
-                  <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '13px', color: 'hsl(var(--muted-foreground))' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Activity */}
-      <Card className="premium-card">
-        <CardHeader className="border-b border-border pb-4">
-          <CardTitle className="text-[18px] font-medium text-foreground font-heading">Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="divide-y divide-border">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="p-5 flex items-center gap-4 hover:bg-muted/50 transition-colors cursor-pointer">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    activity.type === "success"
-                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                      : activity.type === "info"
-                      ? "bg-primary/10 text-primary"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  <span className="material-symbols-rounded text-[20px]">
-                    {activity.type === "success" ? "check_circle" : activity.type === "info" ? "info" : "history"}
-                  </span>
-                </div>
-                <div className="flex-1 space-y-0.5">
-                  <p className="text-[15px] font-medium text-foreground">
-                    {activity.user}
-                  </p>
-                  <p className="text-[14px] text-muted-foreground">{activity.action}</p>
-                </div>
-                <span className="text-[13px] font-medium text-muted-foreground bg-muted px-3 py-1 rounded-full">
-                  {activity.time}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="p-4 border-t border-border">
-            <Button variant="ghost" className="w-full text-primary hover:text-primary/90 hover:bg-primary/10 font-medium rounded-full h-10">
-              View All Activity
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
-  );
+  )
+}
+
+function Separator() {
+  return <div className="h-px bg-border w-full" />
 }
