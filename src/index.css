@@ -28,42 +28,41 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
   --radius: var(--radius);
+  
+  /* Sidebar */
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
 }
 
 @layer base {
   :root {
-    /* UniVerse Core Theme */
     --background: 210 20% 98%;
     --foreground: 222 47% 11%;
-    
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
-    
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    
-    --primary: 250 84% 54%; /* UniVerse Violet */
+    --primary: 250 84% 54%;
     --primary-foreground: 210 20% 98%;
-    
     --secondary: 210 20% 90%;
     --secondary-foreground: 222 47% 11%;
-    
     --muted: 210 20% 94%;
     --muted-foreground: 215 16% 47%;
-    
     --accent: 250 84% 95%;
     --accent-foreground: 250 84% 54%;
-    
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 20% 98%;
-    
     --border: 214 32% 91%;
     --input: 214 32% 91%;
     --ring: 250 84% 54%;
-    
     --radius: 1.25rem;
 
-    /* Sidebar Specific */
     --sidebar: 222 47% 11%;
     --sidebar-foreground: 215 20% 75%;
     --sidebar-primary: 250 84% 54%;
@@ -77,96 +76,59 @@
   .dark {
     --background: 222 47% 11%;
     --foreground: 210 20% 98%;
-    
     --card: 222 47% 13%;
     --card-foreground: 210 20% 98%;
-    
     --popover: 222 47% 11%;
     --popover-foreground: 210 20% 98%;
-    
     --primary: 250 84% 64%;
     --primary-foreground: 222 47% 11%;
-    
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
-    
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
-    
     --accent: 217 33% 17%;
     --accent-foreground: 210 40% 98%;
-    
     --destructive: 0 62% 30%;
     --destructive-foreground: 210 40% 98%;
-    
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: 250 84% 64%;
+    
+    --sidebar: 222 47% 9%;
+    --sidebar-foreground: 215 20% 65%;
+    --sidebar-accent: 217 33% 15%;
+    --sidebar-border: 217 33% 15%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased selection:bg-primary/10 selection:text-primary;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-heading tracking-tight;
-  }
-}
-
-/* Material Symbols */
-.material-symbols-rounded {
-  font-variation-settings:
-  'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 24;
-}
-
-.material-symbols-rounded.filled {
-  font-variation-settings: 'FILL' 1;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
+  background: hsl(var(--muted-foreground) / 0.2);
   border-radius: 20px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.3);
 }
 
 @layer utilities {
-  .glass-header {
-    @apply bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-40;
+  .glass-card {
+    @apply bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 shadow-sm;
   }
-  
-  .premium-shadow {
-    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.08);
-  }
-}
-
-@theme inline {
-  --color-sidebar: hsl(var(--sidebar));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
-  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
 }

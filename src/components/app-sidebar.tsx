@@ -102,24 +102,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border" {...props}>
-      <SidebarHeader className="p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/40 shrink-0 rotate-[-4deg]">
-            <LayoutDashboard className="text-white h-6 w-6" />
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader className="h-16 flex items-center px-4 border-b border-sidebar-border/50">
+        <div className="flex items-center gap-3 w-full">
+          <div className="w-9 h-9 bg-sidebar-primary rounded-xl flex items-center justify-center shadow-lg shadow-sidebar-primary/20 shrink-0 transition-transform hover:rotate-3">
+            <LayoutDashboard className="text-sidebar-primary-foreground h-5 w-5" />
           </div>
-          <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <h1 className="font-heading font-black text-lg tracking-tighter text-white uppercase italic">
-              UniVerse<span className="text-primary text-[10px] ml-1 uppercase tracking-widest font-black not-italic">Labs</span>
+          <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
+            <h1 className="font-heading font-black text-sm tracking-tighter text-sidebar-foreground uppercase italic truncate">
+              UniVerse<span className="text-sidebar-primary not-italic ml-0.5">Labs</span>
             </h1>
-            <p className="text-[9px] font-black text-sidebar-foreground uppercase tracking-[0.2em] leading-none">Command Center</p>
+            <p className="text-[8px] font-black text-sidebar-foreground/40 uppercase tracking-[0.2em] leading-none mt-0.5">Command Center</p>
           </div>
         </div>
       </SidebarHeader>
-      <SidebarContent className="px-2">
+
+      <SidebarContent className="custom-scrollbar py-4">
         {navigationGroups.map((group) => (
-          <SidebarGroup key={group.title} className="py-4">
-            <SidebarGroupLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-sidebar-foreground/40 mb-2 px-4">
+          <SidebarGroup key={group.title}>
+            <SidebarGroupLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-sidebar-foreground/30 mb-2">
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -134,15 +135,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         asChild
                         isActive={isActive}
                         tooltip={item.name}
-                        className={`h-11 rounded-xl px-4 transition-all duration-200 ${
+                        className={`h-10 rounded-xl px-3 transition-all duration-200 ${
                           isActive 
-                            ? "bg-primary text-white shadow-lg shadow-primary/20 font-bold" 
-                            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-white"
+                            ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md shadow-sidebar-primary/20" 
+                            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                         }`}
                       >
                         <Link to={item.href}>
-                          <item.icon className={`h-5 w-5 ${isActive ? "text-white" : "text-sidebar-foreground/60 group-hover:text-white"}`} />
-                          <span className="text-sm tracking-tight">{item.name}</span>
+                          <item.icon className="h-4.5 w-4.5" />
+                          <span className="font-medium tracking-tight">{item.name}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -153,65 +154,62 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter className="p-4">
+
+      <SidebarFooter className="p-4 border-t border-sidebar-border/50 bg-sidebar-accent/20">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-white rounded-2xl border border-sidebar-border bg-sidebar-accent/50 h-16"
+                  className="data-[state=open]:bg-sidebar-accent rounded-xl hover:bg-sidebar-accent/50 transition-colors"
                 >
-                  <Avatar className="h-10 w-10 rounded-xl border-2 border-sidebar-border shadow-lg">
-                    <AvatarImage src={user?.imageUrl} alt={user?.name} />
-                    <AvatarFallback className="rounded-xl bg-primary text-white font-black">
+                  <Avatar className="h-9 w-9 rounded-lg border border-sidebar-border">
+                    <AvatarImage src={user?.imageUrl} />
+                    <AvatarFallback className="rounded-lg bg-sidebar-primary/10 text-sidebar-primary font-black text-xs">
                       {user?.name?.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden ml-2">
-                    <span className="truncate font-black text-white italic uppercase tracking-tight">{user?.name}</span>
-                    <span className="truncate text-[10px] text-sidebar-foreground font-bold uppercase tracking-widest">
+                    <span className="truncate font-bold text-sidebar-foreground">{user?.name}</span>
+                    <span className="truncate text-[10px] text-sidebar-foreground/40 font-bold uppercase tracking-widest">
                       Administrator
                     </span>
                   </div>
-                  <Settings className="ml-auto size-4 group-data-[collapsible=icon]:hidden text-sidebar-foreground/40" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-2xl bg-sidebar border-sidebar-border text-white shadow-2xl p-2"
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-xl bg-sidebar border-sidebar-border text-sidebar-foreground shadow-2xl"
                 side="right"
                 align="end"
-                sideOffset={4}
+                sideOffset={8}
               >
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-3 px-3 py-3 text-left text-sm">
-                    <Avatar className="h-10 w-10 rounded-xl border border-sidebar-border shadow-md">
-                      <AvatarImage src={user?.imageUrl} alt={user?.name} />
-                      <AvatarFallback className="rounded-xl bg-primary text-white font-black text-xs">
+                    <Avatar className="h-9 w-9 rounded-lg border border-sidebar-border">
+                      <AvatarImage src={user?.imageUrl} />
+                      <AvatarFallback className="rounded-lg bg-sidebar-primary/10 text-sidebar-primary font-black text-xs">
                         {user?.name?.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-black italic uppercase text-white">{user?.name}</span>
-                      <span className="truncate text-[10px] text-sidebar-foreground font-bold">
+                      <span className="truncate font-bold text-sidebar-foreground">{user?.name}</span>
+                      <span className="truncate text-[10px] text-sidebar-foreground/40 font-bold">
                         {user?.email}
                       </span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-sidebar-border" />
-                <DropdownMenuItem onClick={() => navigate("/user/profile")} className="rounded-xl focus:bg-sidebar-accent focus:text-white cursor-pointer h-10">
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
+                <DropdownMenuItem onClick={() => navigate("/user/profile")} className="rounded-lg focus:bg-sidebar-accent cursor-pointer">
+                  <User className="mr-2 h-4 w-4" /> Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/user/settings")} className="rounded-xl focus:bg-sidebar-accent focus:text-white cursor-pointer h-10">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
+                <DropdownMenuItem onClick={() => navigate("/user/settings")} className="rounded-lg focus:bg-sidebar-accent cursor-pointer">
+                  <Settings className="mr-2 h-4 w-4" /> Settings
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-sidebar-border" />
-                <DropdownMenuItem onClick={handleSignOut} className="text-red-400 focus:bg-red-500/10 focus:text-red-400 rounded-xl cursor-pointer h-10">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
+                <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:bg-destructive/10 focus:text-destructive rounded-lg cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" /> Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
