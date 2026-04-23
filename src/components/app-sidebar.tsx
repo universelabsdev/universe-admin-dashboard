@@ -89,7 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useUser()
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border" {...props}>
+    <Sidebar collapsible="icon" variant="inset" className="border-r border-sidebar-border" {...props}>
       <SidebarHeader className="h-16 flex items-center px-4">
         <Link to="/" className="flex items-center gap-3 w-full">
           <div className="w-9 h-9 bg-sidebar-primary rounded-xl flex items-center justify-center shadow-lg shadow-sidebar-primary/20 shrink-0">
