@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Badge } from '../../../../components/ui/badge';
 import { Button } from '../../../../components/ui/button';
@@ -214,6 +215,14 @@ export default function ElectionCenterPage() {
 
                 {/* Quick Actions Overlay */}
                 <div className="absolute top-6 right-6 flex gap-2">
+                  <Link to={`/admin/governance/elections/${activeElection.id}/live`}>
+                    <Button
+                      className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 rounded-full h-10 px-6 font-bold shadow-lg"
+                    >
+                      <span className="material-symbols-rounded mr-2 text-[18px]">sensors</span>
+                      Live Dashboard
+                    </Button>
+                  </Link>
                   {(activeElection.status === 'UPCOMING' || activeElection.status === 'DRAFT') && (
                     <Button
                       onClick={() =>

@@ -10,15 +10,32 @@ import { roleService, Permission, GlobalRole, OrganizationalRoleDef } from '@/se
 import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, ShieldCheck, ShieldAlert, Plus, RotateCw } from 'lucide-react';
 import { toast } from 'sonner';
+import { EditRoleDialog } from './EditRoleDialog';
 
 export default function RoleManagementPage() {
   const [activeTab, setActiveTab] = useState('global');
-  const { globalRoles, orgRoleDefs, permissions, loading, error, refresh, updateGlobalRolePermissions, updateOrgRolePermissions } = useRoles();
+  const { 
+    globalRoles, 
+    orgRoleDefs, 
+    permissions, 
+    loading, 
+    error, 
+    refresh, 
+    updateGlobalRolePermissions, 
+    updateOrgRolePermissions,
+    updateGlobalRole,
+    updateOrgRole
+  } = useRoles();
   
   const [selectedRoleType, setSelectedRoleType] = useState<'global' | 'org'>('global');
   const [selectedRoleId, setSelectedRoleId] = useState<string>('');
   const [currentRolePermissions, setCurrentRolePermissions] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Edit Role State
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [roleToEdit, setRoleToEdit] = useState<GlobalRole | OrganizationalRoleDef | null>(null);
+  const [editType, setEditType] = useState<'global' | 'org'>('global');
 
   // Initialize selectedRoleId when roles are loaded
   useEffect(() => {
@@ -87,6 +104,20 @@ export default function RoleManagementPage() {
       toast.success("Permissions updated successfully");
     } else {
       toast.error("Failed to update permissions");
+    }
+  };
+
+  const handleEditRole = (role: GlobalRole | OrganizationalRoleDef, type: 'global' | 'org') => {
+    setRoleToEdit(role);
+    setEditType(type);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateRole = async (id: string, data: any) => {
+    if (editType === 'global') {
+      return await updateGlobalRole(id, data);
+    } else {
+      return await updateOrgRole(id, data);
     }
   };
 
@@ -195,7 +226,12 @@ export default function RoleManagementPage() {
                         >
                           Permissions
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-slate-100 text-slate-500 ml-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleEditRole(role, 'global')}
+                          className="h-8 w-8 p-0 rounded-full hover:bg-slate-100 text-slate-500 ml-2"
+                        >
                           <span className="material-symbols-rounded text-[18px]">edit</span>
                         </Button>
                       </TableCell>
@@ -254,7 +290,12 @@ export default function RoleManagementPage() {
                          >
                            Permissions
                          </Button>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-slate-100 text-slate-500 ml-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleEditRole(role, 'org')}
+                          className="h-8 w-8 p-0 rounded-full hover:bg-slate-100 text-slate-500 ml-2"
+                        >
                           <span className="material-symbols-rounded text-[18px]">edit</span>
                         </Button>
                       </TableCell>
@@ -376,6 +417,14 @@ export default function RoleManagementPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <EditRoleDialog 
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        role={roleToEdit}
+        type={editType}
+        onUpdate={handleUpdateRole}
+      />
     </div>
   );
 }

@@ -51,6 +51,28 @@ export function useRoles() {
     }
   };
 
+  const updateGlobalRole = async (roleId: string, data: Partial<GlobalRole>) => {
+    try {
+      await roleService.updateGlobalRole(roleId, data);
+      await fetchAll();
+      return true;
+    } catch (err: any) {
+      setError(err.message || 'Failed to update role');
+      return false;
+    }
+  };
+
+  const updateOrgRole = async (roleDefId: string, data: Partial<OrganizationalRoleDef>) => {
+    try {
+      await roleService.updateOrganizationalRoleDef(roleDefId, data);
+      await fetchAll();
+      return true;
+    } catch (err: any) {
+      setError(err.message || 'Failed to update role');
+      return false;
+    }
+  };
+
   return {
     globalRoles,
     orgRoleDefs,
@@ -59,6 +81,8 @@ export function useRoles() {
     error,
     refresh: fetchAll,
     updateGlobalRolePermissions,
-    updateOrgRolePermissions
+    updateOrgRolePermissions,
+    updateGlobalRole,
+    updateOrgRole
   };
 }

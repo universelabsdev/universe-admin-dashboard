@@ -61,6 +61,16 @@ class RoleService {
     return response.data;
   }
 
+  async updateGlobalRole(roleId: string, data: Partial<GlobalRole>) {
+    const response = await api.patch(`/admin/roles/global/${roleId}`, data);
+    return response.data.data as GlobalRole;
+  }
+
+  async updateOrganizationalRoleDef(roleDefId: string, data: Partial<OrganizationalRoleDef>) {
+    const response = await api.patch(`/admin/roles/organizational/${roleDefId}`, data);
+    return response.data.data as OrganizationalRoleDef;
+  }
+
   async createGlobalRole(data: Partial<GlobalRole>) {
     const response = await api.post('/admin/roles/global', data);
     return response.data.data as GlobalRole;
