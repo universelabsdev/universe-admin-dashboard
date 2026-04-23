@@ -44,6 +44,10 @@ import { useApiClient } from "@/lib/api-client"
 import { useAdminService } from "@/services/admin.service"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 
+import {
+  Separator
+} from "@/components/ui/separator"
+
 export default function Dashboard() {
   const api = useApiClient();
   const adminService = useAdminService(api);
@@ -88,126 +92,126 @@ export default function Dashboard() {
 
   if (loading && userGrowthData.length === 0) {
     return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-lg font-medium">Synchronizing Systems...</span>
+      <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary/40" />
+        <span className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground animate-pulse">Syncing Command Center...</span>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-        <Card className="shadow-sm">
+    <div className="flex flex-col gap-8 animate-in fade-in duration-700">
+      <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
+        <Card className="border-none shadow-sm bg-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Platform Users
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+              Total Identities
             </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              +12.1% from last month
+            <div className="text-3xl font-black tracking-tight">{stats.totalUsers.toLocaleString()}</div>
+            <p className="text-[10px] text-emerald-500 font-bold mt-1">
+              +12.1% <span className="text-muted-foreground/60 font-medium">Growth Rate</span>
             </p>
           </CardContent>
         </Card>
-        <Card className="shadow-sm">
+        <Card className="border-none shadow-sm bg-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
               Active Students
             </CardTitle>
-            <School className="h-4 w-4 text-muted-foreground" />
+            <School className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.activeStudents.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              +5% from last semester
+            <div className="text-3xl font-black tracking-tight">{stats.activeStudents.toLocaleString()}</div>
+            <p className="text-[10px] text-emerald-500 font-bold mt-1">
+              +5% <span className="text-muted-foreground/60 font-medium">Current Semester</span>
             </p>
           </CardContent>
         </Card>
-        <Card className="shadow-sm border-amber-100 bg-amber-50/30">
+        <Card className="border-none shadow-sm bg-card ring-1 ring-destructive/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Safety Queue
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-destructive">
+              Safety Alerts
             </CardTitle>
-            <Gavel className="h-4 w-4 text-amber-600" />
+            <Gavel className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-amber-700">{stats.reportsPending} Pending</div>
-            <p className="text-xs text-muted-foreground">
-              Requires immediate review
+            <div className="text-3xl font-black tracking-tight text-destructive">{stats.reportsPending}</div>
+            <p className="text-[10px] text-destructive/60 font-bold mt-1 uppercase">
+              Action Required
             </p>
           </CardContent>
         </Card>
-        <Card className="shadow-sm">
+        <Card className="border-none shadow-sm bg-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              System Health
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+              System Uptime
             </CardTitle>
             <Activity className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.serverHealth}%</div>
-            <p className="text-xs text-muted-foreground">
-              All clusters operational
+            <div className="text-3xl font-black tracking-tight">{stats.serverHealth}%</div>
+            <p className="text-[10px] text-emerald-500/60 font-bold mt-1 uppercase">
+              Optimal Status
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-6 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
         <div className="lg:col-span-1 xl:col-span-2 space-y-8">
            <ChartAreaInteractive data={userGrowthData} />
            
-           <Card className="shadow-sm">
-            <CardHeader className="flex flex-row items-center">
-              <div className="grid gap-2">
-                <CardTitle>Recent Platform Activity</CardTitle>
-                <CardDescription>
+           <Card className="border-none shadow-sm overflow-hidden">
+            <CardHeader className="flex flex-row items-center bg-muted/30 pb-4">
+              <div className="grid gap-1">
+                <CardTitle className="text-lg font-bold tracking-tight">Recent Activity</CardTitle>
+                <CardDescription className="text-xs">
                   Real-time events from across the UniVerse.
                 </CardDescription>
               </div>
-              <Button asChild size="sm" className="ml-auto gap-1">
+              <Button asChild size="sm" variant="outline" className="ml-auto rounded-full px-4 h-8 text-xs font-bold uppercase tracking-widest">
                 <Link to="#">
-                  View All
-                  <ArrowUpRight className="h-4 w-4" />
+                  Logs
+                  <ArrowUpRight className="h-3 w-3 ml-1" />
                 </Link>
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-muted/10">
                   <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead className="hidden sm:table-cell">Type</TableHead>
-                    <TableHead className="hidden sm:table-cell">Status</TableHead>
-                    <TableHead className="hidden md:table-cell">Date</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                    <TableHead className="pl-6 h-10 text-[10px] font-black uppercase tracking-widest text-muted-foreground">User</TableHead>
+                    <TableHead className="hidden sm:table-cell h-10 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Type</TableHead>
+                    <TableHead className="hidden sm:table-cell h-10 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Status</TableHead>
+                    <TableHead className="hidden md:table-cell h-10 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Date</TableHead>
+                    <TableHead className="text-right pr-6 h-10 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {recentActivity.map((activity) => (
-                    <TableRow key={activity.id}>
-                      <TableCell>
-                        <div className="font-medium">{activity.user}</div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
+                    <TableRow key={activity.id} className="hover:bg-muted/5 transition-colors border-muted/20">
+                      <TableCell className="pl-6 py-4">
+                        <div className="font-bold text-sm">{activity.user}</div>
+                        <div className="hidden text-[10px] text-muted-foreground md:inline font-medium uppercase tracking-tight">
                           {activity.action}
                         </div>
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">
-                        {activity.type === 'success' ? 'System' : 'User'}
+                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{activity.type === 'success' ? 'System' : 'User'}</span>
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">
-                        <Badge className="text-xs" variant={activity.type === 'success' ? 'outline' : 'secondary'}>
+                        <Badge className="text-[9px] font-black uppercase rounded-md px-1.5 h-5" variant={activity.type === 'success' ? 'outline' : 'secondary'}>
                           {activity.type === 'success' ? 'Verified' : 'Flagged'}
                         </Badge>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {activity.time}
+                        <span className="text-xs font-medium text-muted-foreground">{activity.time}</span>
                       </TableCell>
-                      <TableCell className="text-right font-medium">
-                        <Button variant="ghost" size="sm">Details</Button>
+                      <TableCell className="text-right pr-6">
+                        <Button variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-bold text-primary">View</Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -217,81 +221,75 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <Card className="shadow-sm h-fit">
-          <CardHeader>
-            <CardTitle>Security Status</CardTitle>
-            <CardDescription>
-              Overview of system access and integrity.
+        <Card className="border-none shadow-sm h-fit bg-card overflow-hidden">
+          <CardHeader className="bg-primary/5 pb-6">
+            <CardTitle className="text-lg font-bold tracking-tight">Security Status</CardTitle>
+            <CardDescription className="text-xs">
+              System access and integrity metrics.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-8">
+          <CardContent className="grid gap-8 p-6">
             <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarFallback className="bg-primary/10 text-primary">SC</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">
+              <div className="h-10 w-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                 <ShieldCheck className="h-5 w-5 text-emerald-500" />
+              </div>
+              <div className="grid gap-0.5">
+                <p className="text-sm font-bold leading-none">
                   SSL/TLS Encryption
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Active (Version 1.3)
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
+                  Version 1.3 Active
                 </p>
               </div>
-              <div className="ml-auto font-medium text-emerald-500 flex items-center">
-                <ShieldCheck className="h-4 w-4 mr-1" />
+              <div className="ml-auto font-black text-[10px] text-emerald-500 uppercase tracking-widest">
                 Secure
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarFallback className="bg-primary/10 text-primary">DB</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">
-                  Database Backups
+              <div className="h-10 w-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                 <ShieldCheck className="h-5 w-5 text-emerald-500" />
+              </div>
+              <div className="grid gap-0.5">
+                <p className="text-sm font-bold leading-none">
+                  Snapshot Integrity
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Last: 12 minutes ago
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
+                  12m since last sync
                 </p>
               </div>
-              <div className="ml-auto font-medium text-emerald-500 flex items-center">
-                <ShieldCheck className="h-4 w-4 mr-1" />
+              <div className="ml-auto font-black text-[10px] text-emerald-500 uppercase tracking-widest">
                 Valid
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarFallback className="bg-primary/10 text-primary">AU</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">
+              <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                 <Activity className="h-5 w-5 text-primary" />
+              </div>
+              <div className="grid gap-0.5">
+                <p className="text-sm font-bold leading-none">
                   Auth Latency
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Global average
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
+                  Global Average
                 </p>
               </div>
-              <div className="ml-auto font-medium">
+              <div className="ml-auto font-black text-sm tabular-nums">
                 42ms
               </div>
             </div>
             
-            <Separator />
+            <Separator className="bg-muted/50" />
             
-            <div className="space-y-4">
-              <h4 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">System Alerts</h4>
-              <div className="p-4 rounded-xl bg-muted/50 border border-border">
-                <p className="text-sm font-medium">No critical issues detected in the last 24 hours.</p>
+            <div className="space-y-4 pt-2">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Intelligence Feed</h4>
+              <div className="p-4 rounded-2xl bg-muted/20 border border-muted/50">
+                <p className="text-xs font-medium text-muted-foreground leading-relaxed">No critical anomalies detected in the last <span className="text-foreground font-bold">24 hours</span>.</p>
               </div>
-              <Button variant="outline" className="w-full rounded-xl">Run Security Audit</Button>
+              <Button variant="outline" className="w-full rounded-2xl h-12 font-black uppercase text-[10px] tracking-[0.2em] shadow-sm">Initialize Security Audit</Button>
             </div>
           </CardContent>
         </Card>
       </div>
     </div>
   )
-}
-
-function Separator() {
-  return <div className="h-px bg-border w-full" />
 }
