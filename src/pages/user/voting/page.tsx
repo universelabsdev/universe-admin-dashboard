@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApiClient } from "../../../lib/api-client";
 import { useAdminService } from "../../../services/admin.service";
@@ -6,6 +6,29 @@ import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
 import { toast } from "sonner";
+
+function useCountdown(targetDate: string | undefined): string {
+  const [label, setLabel] = useState('');
+
+  useEffect(() => {
+    if (!targetDate) return;
+    const update = () => {
+      const diff = new Date(targetDate).getTime() - Date.now();
+      if (diff <= 0) { setLabel('Closed'); return; }
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      if (h > 48) setLabel(`${Math.floor(h / 24)}d remaining`);
+      else if (h > 0) setLabel(`${h}h ${m}m remaining`);
+      else setLabel(`${m}m ${s}s remaining`);
+    };
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [targetDate]);
+
+  return label;
+}
 
 export default function VotingCenterPage() {
   const queryClient = useQueryClient();
@@ -167,56 +190,15 @@ export default function VotingCenterPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {elections.map((election: any) => {
-          const alreadyVoted = !!votedElections[election.id];
-          const endDate = election.endDate || election.votingEndDate;
-          return (
-            <Card key={election.id} className="premium-card border-none overflow-hidden rounded-3xl shadow-lg bg-card text-card-foreground group hover:shadow-xl transition-all duration-300">
-              <div className="h-32 w-full relative">
-                <img
-                  src={election.coverImage || 'https://images.unsplash.com/photo-1540910419892-f3174207baec?q=80&w=2070&auto=format&fit=crop'}
-                  alt={election.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                {alreadyVoted ? (
-                  <Badge className="absolute top-4 right-4 bg-blue-500 text-white border-none rounded-full">Voted</Badge>
-                ) : (
-                  <Badge className="absolute top-4 right-4 bg-emerald-500 text-white border-none rounded-full">Active</Badge>
-                )}
-              </div>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl font-bold line-clamp-1">{election.title}</CardTitle>
-                <CardDescription className="line-clamp-2 text-xs">
-                  {election.description || 'No description provided.'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between text-xs font-medium">
-                    <span className="text-muted-foreground">Ends</span>
-                    <span className="text-foreground">
-                      {endDate ? new Date(endDate).toLocaleDateString() : 'N/A'}
-                    </span>
-                  </div>
-                  {alreadyVoted ? (
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-3 text-center">
-                      <p className="text-xs font-bold text-blue-600 dark:text-blue-400">Vote recorded</p>
-                      <p className="text-[10px] text-muted-foreground font-mono mt-1">{votedElections[election.id]}</p>
-                    </div>
-                  ) : (
-                    <Button
-                      onClick={() => setSelectedElectionId(election.id)}
-                      className="w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
-                    >
-                      View Ballot & Vote
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        {elections.map((election: any) => (
+          <ElectionCard
+            key={election.id}
+            election={election}
+            alreadyVoted={!!votedElections[election.id]}
+            confirmationCode={votedElections[election.id]}
+            onVote={() => setSelectedElectionId(election.id)}
+          />
+        ))}
 
         {elections.length === 0 && (
           <div className="col-span-full py-20 text-center">

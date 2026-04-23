@@ -515,7 +515,7 @@ export default function ElectionCenterPage() {
                               Results Breakdown
                             </h5>
                             {resultsData.positions[0].results.map((r: any, i: number) => {
-                              const pct = r.percentage ?? Math.round((r.votes / (resultsData.totalVotes || 1)) * 100);
+                              const pct = r.percentage ?? 0;
                               return (
                                 <div key={r.candidateId || i} className="flex items-center gap-4">
                                   <div className="w-32 text-sm font-bold text-foreground truncate">
@@ -699,9 +699,9 @@ export default function ElectionCenterPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-4xl font-black mb-1">{analytics?.averageTurnout || '0'}%</div>
+              <div className="text-4xl font-black mb-1">{analytics?.averageTurnout ?? 0}%</div>
               <p className="text-xs font-medium opacity-70 mb-4">
-                Average across all 2026 academic sessions
+                Weighted average across all completed elections
               </p>
               <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden mb-4">
                 <div
