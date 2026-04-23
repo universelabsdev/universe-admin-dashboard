@@ -48,6 +48,9 @@ interface Voter {
 interface ElectionResults {
   electionId: string;
   title: string;
+  status?: string;
+  votingEndDate?: string;
+  endDate?: string;
   totalVotes: number;
   eligibleVoters: number;
   turnout: number;
@@ -70,6 +73,12 @@ export default function LiveResultsPage() {
   const [recentVoters, setRecentVoters] = useState<Voter[]>([]);
   const [lastVote, setLastVote] = useState<{ candidateId: string; timestamp: string; voter?: Voter } | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Initial data load
   const { data: initialData, isLoading } = useQuery({
@@ -90,6 +99,30 @@ export default function LiveResultsPage() {
       }
     }
   }, [initialData]);
+
+  const electionStatus = useMemo(() => {
+    if (!liveResults) return 'UNKNOWN';
+    const end = new Date(liveResults.votingEndDate || liveResults.endDate || 0);
+    const now = currentTime;
+    
+    if (liveResults.status === 'CLOSED' || liveResults.status === 'COMPLETED') return 'FINALIZED';
+    if (now > end) return 'ENDED';
+    return 'LIVE';
+  }, [liveResults, currentTime]);
+
+  const timeRemaining = useMemo(() => {
+    if (!liveResults || electionStatus !== 'LIVE') return null;
+    const end = new Date(liveResults.votingEndDate || liveResults.endDate || 0);
+    const diff = end.getTime() - currentTime.getTime();
+    
+    if (diff <= 0) return '00:00:00';
+    
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }, [liveResults, electionStatus, currentTime]);
 
   // Socket.io Integration
   useEffect(() => {
@@ -217,13 +250,24 @@ export default function LiveResultsPage() {
                 <span className="w-2 h-2 rounded-full bg-primary mr-2 animate-ping" />
                 Live Control Center
               </div>
-              {isConnected ? (
+              
+              {electionStatus === 'LIVE' ? (
                 <div className="flex items-center bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest">
-                  Active Link
+                  Election Live
+                </div>
+              ) : electionStatus === 'ENDED' ? (
+                <div className="flex items-center bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+                  Polls Closed
                 </div>
               ) : (
-                <div className="flex items-center bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest">
-                  Connecting...
+                <div className="flex items-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+                  Results Finalized
+                </div>
+              )}
+
+              {isConnected && (
+                <div className="flex items-center bg-slate-500/20 text-slate-400 border border-slate-500/30 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+                  Sync Active
                 </div>
               )}
             </div>
@@ -234,6 +278,12 @@ export default function LiveResultsPage() {
         </div>
         
         <div className="flex items-center gap-4">
+           {timeRemaining && (
+             <div className="bg-white/5 backdrop-blur-xl px-8 py-4 rounded-[32px] border border-white/10 shadow-2xl text-center">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Time To Close</p>
+                <p className="text-2xl font-black text-amber-400 font-mono">{timeRemaining}</p>
+             </div>
+           )}
            <div className="bg-white/5 backdrop-blur-xl px-8 py-4 rounded-[32px] border border-white/10 shadow-2xl">
               <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Current Turnout</p>
               <div className="flex items-baseline gap-1">
