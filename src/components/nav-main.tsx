@@ -1,14 +1,22 @@
 "use client"
 
-import { MailIcon, PlusCircleIcon, type LucideIcon } from "lucide-react"
+import { Link, useLocation } from "react-router-dom"
+import { ChevronRight, type LucideIcon } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import {
   SidebarGroup,
-  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 
 export function NavMain({
@@ -18,41 +26,72 @@ export function NavMain({
     title: string
     url: string
     icon?: LucideIcon
+    isActive?: boolean
+    items?: {
+      title: string
+      url: string
+    }[]
   }[]
 }) {
+  const location = useLocation();
+
   return (
     <SidebarGroup>
-      <SidebarGroupContent className="flex flex-col gap-2">
-        <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton
-              tooltip="Quick Create"
-              className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
+      <SidebarGroupLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-sidebar-foreground/30 mb-2 px-4">Platform Interface</SidebarGroupLabel>
+      <SidebarMenu>
+        {items.map((item) => {
+          const isParentActive = location.pathname.startsWith(item.url) || (item.url === "/" && location.pathname === "/");
+          
+          return (
+            <Collapsible
+              key={item.title}
+              asChild
+              defaultOpen={item.isActive || isParentActive}
+              className="group/collapsible"
             >
-              <PlusCircleIcon />
-              <span>Quick Create</span>
-            </SidebarMenuButton>
-            <Button
-              size="icon"
-              className="h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-            >
-              <MailIcon />
-              <span className="sr-only">Inbox</span>
-            </Button>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title}>
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton 
+                    tooltip={item.title}
+                    className={`h-10 rounded-xl px-3 transition-all duration-200 ${
+                      isParentActive 
+                        ? "text-sidebar-primary font-bold" 
+                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    }`}
+                  >
+                    {item.icon && <item.icon className={`h-4.5 w-4.5 ${isParentActive ? "text-sidebar-primary" : "text-sidebar-foreground/50"}`} />}
+                    <span className="tracking-tight">{item.title}</span>
+                    <ChevronRight className="ml-auto h-3 w-3 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-sidebar-foreground/30" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub className="border-sidebar-border/50 ml-4 py-1 gap-1">
+                    {item.items?.map((subItem) => {
+                      const isSubActive = location.pathname === subItem.url;
+                      return (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton 
+                            asChild
+                            className={`h-8 rounded-lg px-3 transition-all duration-200 ${
+                              isSubActive 
+                                ? "bg-sidebar-primary text-sidebar-primary-foreground font-black shadow-md shadow-sidebar-primary/10" 
+                                : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                            }`}
+                          >
+                            <Link to={subItem.url}>
+                              <span className="text-xs uppercase tracking-widest leading-none">{subItem.title}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )
+                    })}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+          );
+        })}
+      </SidebarMenu>
     </SidebarGroup>
   )
 }
