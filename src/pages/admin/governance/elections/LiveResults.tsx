@@ -28,6 +28,8 @@ interface CandidateResult {
   candidateId: string;
   candidateName: string;
   candidatePhoto?: string;
+  photo?: string;
+  imageUrl?: string;
   votes: number;
   percentage: number;
 }
@@ -36,6 +38,9 @@ interface Voter {
   id: string;
   name: string;
   avatar?: string;
+  imageUrl?: string;
+  photo?: string;
+  profileImage?: string;
   timestamp: string;
   department?: string;
 }
@@ -298,7 +303,7 @@ export default function LiveResultsPage() {
                               </div>
                               <div className="relative">
                                 <Avatar className="h-20 w-20 border-4 border-white/10 shadow-2xl rounded-[28px]">
-                                  <AvatarImage src={candidate.candidatePhoto} />
+                                  <AvatarImage src={candidate.candidatePhoto || candidate.photo || candidate.imageUrl} />
                                   <AvatarFallback className="bg-slate-800 text-slate-400 font-black text-2xl rounded-[28px]">
                                     {candidate.candidateName.charAt(0)}
                                   </AvatarFallback>
@@ -400,7 +405,7 @@ export default function LiveResultsPage() {
                       }`}
                     >
                       <Avatar className="h-12 w-12 border-2 border-white/10 rounded-[16px] shrink-0">
-                        <AvatarImage src={voter.avatar} />
+                        <AvatarImage src={voter.avatar || voter.imageUrl || voter.photo || voter.profileImage} />
                         <AvatarFallback className="bg-slate-800 text-slate-400 font-bold rounded-[16px]">
                           {voter.name.charAt(0)}
                         </AvatarFallback>
