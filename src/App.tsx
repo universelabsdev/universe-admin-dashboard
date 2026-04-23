@@ -183,7 +183,7 @@ export default function App() {
           <QueryClientProvider client={queryClient}>
             <BrowserRouter>
             <Routes>
-              <Route path="/login" element={
+              <Route path="/login/*" element={
                 <SignedOut>
                   <Login />
                 </SignedOut>
