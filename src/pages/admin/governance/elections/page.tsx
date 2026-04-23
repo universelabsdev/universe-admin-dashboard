@@ -509,35 +509,53 @@ export default function ElectionCenterPage() {
                         </div>
 
                         {/* Per-candidate results */}
-                        {resultsData?.positions?.[0]?.results?.length > 0 && (
-                          <div className="space-y-3">
-                            <h5 className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
-                              Results Breakdown
-                            </h5>
-                            {resultsData.positions[0].results.map((r: any, i: number) => {
-                              const pct = r.percentage ?? 0;
-                              return (
-                                <div key={r.candidateId || i} className="flex items-center gap-4">
-                                  <div className="w-32 text-sm font-bold text-foreground truncate">
-                                    {r.candidateName || r.candidateId}
+                        {resultsData?.positions?.[0]?.results?.length > 0 && (() => {
+                          const sorted = [...resultsData.positions[0].results].sort((a: any, b: any) => b.votes - a.votes);
+                          const leadMarginVotes = sorted.length >= 2 ? sorted[0].votes - sorted[1].votes : null;
+                          const leadMarginPct = sorted.length >= 2 ? parseFloat((sorted[0].percentage - sorted[1].percentage).toFixed(1)) : null;
+                          return (
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <h5 className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+                                  Results Breakdown
+                                </h5>
+                                {leadMarginVotes !== null && leadMarginVotes > 0 && (
+                                  <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 rounded-full px-3 py-1">
+                                    Lead: +{leadMarginVotes} votes ({leadMarginPct}%)
+                                  </span>
+                                )}
+                                {leadMarginVotes === 0 && (
+                                  <span className="text-xs font-bold text-amber-500 bg-amber-500/10 rounded-full px-3 py-1">
+                                    Tied
+                                  </span>
+                                )}
+                              </div>
+                              {sorted.map((r: any, i: number) => {
+                                const pct = r.percentage ?? 0;
+                                return (
+                                  <div key={r.candidateId || i} className="flex items-center gap-4">
+                                    <div className="w-32 text-sm font-bold text-foreground truncate flex items-center gap-1">
+                                      {i === 0 && <span className="material-symbols-rounded text-[14px] text-amber-400">emoji_events</span>}
+                                      {r.candidateName || r.candidateId}
+                                    </div>
+                                    <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
+                                      <div
+                                        className={`h-full rounded-full transition-all duration-700 ${i === 0 ? 'bg-primary' : 'bg-muted-foreground/40'}`}
+                                        style={{ width: `${Math.min(100, pct)}%` }}
+                                      />
+                                    </div>
+                                    <div className="w-20 text-right text-sm font-black text-foreground">
+                                      {r.votes}{' '}
+                                      <span className="text-muted-foreground font-normal">
+                                        ({pct}%)
+                                      </span>
+                                    </div>
                                   </div>
-                                  <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
-                                    <div
-                                      className="h-full bg-primary rounded-full transition-all duration-700"
-                                      style={{ width: `${Math.min(100, pct)}%` }}
-                                    />
-                                  </div>
-                                  <div className="w-20 text-right text-sm font-black text-foreground">
-                                    {r.votes}{' '}
-                                    <span className="text-muted-foreground font-normal">
-                                      ({pct}%)
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
 
                         <div className="grid gap-6 md:grid-cols-2">
                           <Card className="border border-border bg-card rounded-3xl shadow-sm">

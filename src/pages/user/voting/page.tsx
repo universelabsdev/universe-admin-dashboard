@@ -30,6 +30,77 @@ function useCountdown(targetDate: string | undefined): string {
   return label;
 }
 
+function ElectionCard({
+  election,
+  alreadyVoted,
+  confirmationCode,
+  onVote,
+}: {
+  election: any;
+  alreadyVoted: boolean;
+  confirmationCode?: string;
+  onVote: () => void;
+}) {
+  const endDate = election.endDate || election.votingEndDate;
+  const countdown = useCountdown(endDate);
+  const totalVotes: number = election.totalVotes ?? 0;
+
+  return (
+    <Card className="premium-card border-none overflow-hidden rounded-3xl shadow-lg bg-card text-card-foreground group hover:shadow-xl transition-all duration-300">
+      <div className="h-32 w-full relative">
+        <img
+          src={election.coverImage || 'https://images.unsplash.com/photo-1540910419892-f3174207baec?q=80&w=2070&auto=format&fit=crop'}
+          alt={election.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        {alreadyVoted ? (
+          <Badge className="absolute top-4 right-4 bg-blue-500 text-white border-none rounded-full">Voted</Badge>
+        ) : (
+          <Badge className="absolute top-4 right-4 bg-emerald-500 text-white border-none rounded-full animate-pulse">Live</Badge>
+        )}
+      </div>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xl font-bold line-clamp-1">{election.title}</CardTitle>
+        <CardDescription className="line-clamp-2 text-xs">
+          {election.description || 'No description provided.'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {/* Countdown + vote count */}
+          <div className="flex items-center justify-between text-xs font-medium">
+            <span className="flex items-center gap-1 text-amber-500 font-bold">
+              <span className="material-symbols-rounded text-[14px]">timer</span>
+              {countdown || (endDate ? new Date(endDate).toLocaleDateString() : 'N/A')}
+            </span>
+            {totalVotes > 0 && (
+              <span className="text-muted-foreground">
+                {totalVotes.toLocaleString()} vote{totalVotes !== 1 ? 's' : ''} cast
+              </span>
+            )}
+          </div>
+          {alreadyVoted ? (
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-3 text-center">
+              <p className="text-xs font-bold text-blue-600 dark:text-blue-400">Vote recorded</p>
+              {confirmationCode && (
+                <p className="text-[10px] text-muted-foreground font-mono mt-1">{confirmationCode}</p>
+              )}
+            </div>
+          ) : (
+            <Button
+              onClick={onVote}
+              className="w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
+            >
+              View Ballot &amp; Vote
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function VotingCenterPage() {
   const queryClient = useQueryClient();
   const api = useApiClient();
