@@ -339,43 +339,43 @@ export function CreateElectionDialog({ onElectionCreated }: { onElectionCreated:
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label className="text-sm font-bold text-muted-foreground ml-1">Election Category *</Label>
-                    <NativeSelect 
+                    <select 
                       value={formData.electionType} 
-                      onValueChange={(v: string) => setForm({...formData, electionType: v})}
-                      className="rounded-2xl h-12 bg-background border-input"
+                      onChange={(e) => setForm({...formData, electionType: e.target.value})}
+                      className="flex h-12 w-full items-center justify-between whitespace-nowrap rounded-2xl border border-input bg-background px-4 py-2 text-sm shadow-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
                     >
                       {metadata.electionTypes.map((type: string) => (
                         <option key={type} value={type}>{type.replace(/_/g, ' ')}</option>
                       ))}
-                    </NativeSelect>
+                    </select>
                   </div>
                   <div className="grid gap-2">
                     <Label className="text-sm font-bold text-muted-foreground ml-1">Campus Branch</Label>
-                    <NativeSelect 
+                    <select 
                       value={formData.branchId} 
-                      onValueChange={(v: string) => setForm({...formData, branchId: v})}
-                      className="rounded-2xl h-12 bg-background border-input"
+                      onChange={(e) => setForm({...formData, branchId: e.target.value})}
+                      className="flex h-12 w-full items-center justify-between whitespace-nowrap rounded-2xl border border-input bg-background px-4 py-2 text-sm shadow-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
                     >
                       <option value="">All Branches</option>
                       {branches.map(b => (
                         <option key={b.id} value={b.id}>{b.name}</option>
                       ))}
-                    </NativeSelect>
+                    </select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label className="text-sm font-bold text-muted-foreground ml-1">Organization Type</Label>
-                    <NativeSelect 
+                    <select 
                       value={formData.organizationType} 
-                      onValueChange={(v: string) => setForm({...formData, organizationType: v})}
-                      className="rounded-2xl h-12 bg-background border-input"
+                      onChange={(e) => setForm({...formData, organizationType: e.target.value})}
+                      className="flex h-12 w-full items-center justify-between whitespace-nowrap rounded-2xl border border-input bg-background px-4 py-2 text-sm shadow-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
                     >
                       {metadata.organizationTypes.map((type: string) => (
                         <option key={type} value={type}>{type}</option>
                       ))}
-                    </NativeSelect>
+                    </select>
                   </div>
                   <div className="grid gap-2">
                     <Label className="text-sm font-bold text-muted-foreground ml-1">Org ID (Optional)</Label>

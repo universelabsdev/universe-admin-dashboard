@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { io } from "socket.io-client";
 
@@ -44,47 +44,53 @@ export default function ProtectedLayout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 sticky top-0 bg-background/80 backdrop-blur-md z-30">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/">UniVerse</BreadcrumbLink>
-              </BreadcrumbItem>
-              {pathSegments.length > 0 && <BreadcrumbSeparator className="hidden md:block" />}
-              {pathSegments.map((segment, index) => {
-                const isLast = index === pathSegments.length - 1;
-                const href = `/${pathSegments.slice(0, index + 1).join('/')}`;
-                const title = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+      <SidebarInset className="bg-slate-50/50">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-6 sticky top-0 bg-background/80 backdrop-blur-md z-30">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="-ml-2 h-9 w-9 rounded-xl hover:bg-slate-100 transition-colors" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink asChild>
+                    <Link to="/" className="font-bold text-slate-400 hover:text-primary transition-colors">UniVerse</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                {pathSegments.length > 0 && <BreadcrumbSeparator className="hidden md:block" />}
+                {pathSegments.map((segment, index) => {
+                  const isLast = index === pathSegments.length - 1;
+                  const href = `/${pathSegments.slice(0, index + 1).join('/')}`;
+                  const title = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
 
-                return (
-                  <React.Fragment key={href}>
-                    <BreadcrumbItem>
-                      {isLast ? (
-                        <BreadcrumbPage>{title}</BreadcrumbPage>
-                      ) : (
-                        <BreadcrumbLink href={href}>{title}</BreadcrumbLink>
-                      )}
-                    </BreadcrumbItem>
-                    {!isLast && <BreadcrumbSeparator />}
-                  </React.Fragment>
-                );
-              })}
-            </BreadcrumbList>
-          </Breadcrumb>
+                  return (
+                    <React.Fragment key={href}>
+                      <BreadcrumbItem>
+                        {isLast ? (
+                          <BreadcrumbPage className="font-black text-slate-900 uppercase italic tracking-tight">{title}</BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink asChild>
+                            <Link to={href} className="font-bold text-slate-400 hover:text-primary transition-colors">{title}</Link>
+                          </BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                      {!isLast && <BreadcrumbSeparator />}
+                    </React.Fragment>
+                  );
+                })}
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
           
           <div className="ml-auto flex items-center gap-4">
-             <div className="hidden sm:flex items-center px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+             <div className="hidden sm:flex items-center px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl shadow-sm">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-2" />
-                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Global Sync</span>
+                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Global Sync Active</span>
              </div>
           </div>
         </header>
         
-        <main className="flex flex-1 flex-col gap-4 p-4 md:p-8">
-          <div className="mx-auto w-full max-w-[1400px]">
+        <main className="flex-1">
+          <div className="p-6 md:p-10 max-w-[1600px] mx-auto w-full pb-32">
             <Outlet />
           </div>
         </main>

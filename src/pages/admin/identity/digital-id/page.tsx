@@ -289,7 +289,7 @@ export default function DigitalIdManagementPage() {
                   users.map(user => (
                     <motion.div
                       key={user.id}
-                      whileHover={{ y: -4, shadow: "0 20px 40px -12px rgba(0, 0, 0, 0.1)" }}
+                      whileHover={{ y: -4, boxShadow: "0 20px 40px -12px rgba(0, 0, 0, 0.1)" }}
                       onClick={() => handleOpenDetails(user)}
                       className={`premium-card group relative bg-white border-2 rounded-[24px] p-0 transition-all duration-300 cursor-pointer overflow-hidden ${user.isVerified ? 'border-emerald-100 hover:border-emerald-300' : 'border-slate-200 hover:border-indigo-300'}`}
                     >

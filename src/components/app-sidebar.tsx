@@ -102,23 +102,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <div className="p-2 flex items-center gap-3">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
-            <LayoutDashboard className="text-white h-5 w-5" />
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border" {...props}>
+      <SidebarHeader className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/40 shrink-0 rotate-[-4deg]">
+            <LayoutDashboard className="text-white h-6 w-6" />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <h1 className="font-heading font-black text-sm tracking-tighter text-foreground">
-              UniVerse<span className="text-primary text-[10px] ml-1 uppercase tracking-widest font-bold">Admin</span>
+            <h1 className="font-heading font-black text-lg tracking-tighter text-white uppercase italic">
+              UniVerse<span className="text-primary text-[10px] ml-1 uppercase tracking-widest font-black not-italic">Labs</span>
             </h1>
+            <p className="text-[9px] font-black text-sidebar-foreground uppercase tracking-[0.2em] leading-none">Command Center</p>
           </div>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="px-2">
         {navigationGroups.map((group) => (
-          <SidebarGroup key={group.title}>
-            <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+          <SidebarGroup key={group.title} className="py-4">
+            <SidebarGroupLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-sidebar-foreground/40 mb-2 px-4">
+              {group.title}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => {
@@ -131,10 +134,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         asChild
                         isActive={isActive}
                         tooltip={item.name}
+                        className={`h-11 rounded-xl px-4 transition-all duration-200 ${
+                          isActive 
+                            ? "bg-primary text-white shadow-lg shadow-primary/20 font-bold" 
+                            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-white"
+                        }`}
                       >
                         <Link to={item.href}>
-                          <item.icon />
-                          <span>{item.name}</span>
+                          <item.icon className={`h-5 w-5 ${isActive ? "text-white" : "text-sidebar-foreground/60 group-hover:text-white"}`} />
+                          <span className="text-sm tracking-tight">{item.name}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -145,63 +153,63 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="p-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-white rounded-2xl border border-sidebar-border bg-sidebar-accent/50 h-16"
                 >
-                  <Avatar className="h-8 w-8 rounded-lg">
+                  <Avatar className="h-10 w-10 rounded-xl border-2 border-sidebar-border shadow-lg">
                     <AvatarImage src={user?.imageUrl} alt={user?.name} />
-                    <AvatarFallback className="rounded-lg bg-primary/10 text-primary">
+                    <AvatarFallback className="rounded-xl bg-primary text-white font-black">
                       {user?.name?.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                    <span className="truncate font-semibold">{user?.name}</span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      System Administrator
+                  <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden ml-2">
+                    <span className="truncate font-black text-white italic uppercase tracking-tight">{user?.name}</span>
+                    <span className="truncate text-[10px] text-sidebar-foreground font-bold uppercase tracking-widest">
+                      Administrator
                     </span>
                   </div>
-                  <Settings className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
+                  <Settings className="ml-auto size-4 group-data-[collapsible=icon]:hidden text-sidebar-foreground/40" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-2xl bg-sidebar border-sidebar-border text-white shadow-2xl p-2"
                 side="right"
                 align="end"
                 sideOffset={4}
               >
                 <DropdownMenuLabel className="p-0 font-normal">
-                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <Avatar className="h-8 w-8 rounded-lg">
+                  <div className="flex items-center gap-3 px-3 py-3 text-left text-sm">
+                    <Avatar className="h-10 w-10 rounded-xl border border-sidebar-border shadow-md">
                       <AvatarImage src={user?.imageUrl} alt={user?.name} />
-                      <AvatarFallback className="rounded-lg bg-primary/10 text-primary">
+                      <AvatarFallback className="rounded-xl bg-primary text-white font-black text-xs">
                         {user?.name?.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">{user?.name}</span>
-                      <span className="truncate text-xs text-muted-foreground">
+                      <span className="truncate font-black italic uppercase text-white">{user?.name}</span>
+                      <span className="truncate text-[10px] text-sidebar-foreground font-bold">
                         {user?.email}
                       </span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/user/profile")}>
+                <DropdownMenuSeparator className="bg-sidebar-border" />
+                <DropdownMenuItem onClick={() => navigate("/user/profile")} className="rounded-xl focus:bg-sidebar-accent focus:text-white cursor-pointer h-10">
                   <User className="mr-2 h-4 w-4" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/user/settings")}>
+                <DropdownMenuItem onClick={() => navigate("/user/settings")} className="rounded-xl focus:bg-sidebar-accent focus:text-white cursor-pointer h-10">
                   <Settings className="mr-2 h-4 w-4" />
                   Settings
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+                <DropdownMenuSeparator className="bg-sidebar-border" />
+                <DropdownMenuItem onClick={handleSignOut} className="text-red-400 focus:bg-red-500/10 focus:text-red-400 rounded-xl cursor-pointer h-10">
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>

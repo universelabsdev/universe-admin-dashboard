@@ -16,7 +16,7 @@ import {
   UserPlus, UserMinus, SearchX, Activity, BarChart3, TrendingUp, 
   MapPin, GraduationCap, Building2, Calendar, Mail, Shield, 
   MessageSquare, MoreHorizontal, Download, Share2, Sparkles,
-  CheckCircle2, AlertCircle, Clock
+  CheckCircle2, AlertCircle, Clock, XCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
@@ -590,7 +590,7 @@ export default function NetworkManagementPage() {
                   users.map(user => (
                     <motion.div
                       key={user.id}
-                      whileHover={{ y: -6, shadow: "0 25px 50px -12px rgba(0, 0, 0, 0.08)" }}
+                      whileHover={{ y: -6, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.08)" }}
                       onClick={() => handleOpenDetails(user)}
                       className="premium-card group relative bg-white border border-slate-200/60 rounded-[28px] p-6 transition-all duration-300 cursor-pointer"
                     >
@@ -811,8 +811,8 @@ export default function NetworkManagementPage() {
                       </Avatar>
                    </div>
                    <div className="absolute top-4 right-4 flex gap-2">
-                      <Button variant="white" size="icon" className="h-9 w-9 rounded-full bg-white/80 backdrop-blur-sm border-none shadow-sm hover:bg-white" onClick={() => setIsDetailsOpen(false)}>
-                         <MoreHorizontal className="h-5 w-5 text-slate-600" />
+                      <Button variant="secondary" size="icon" className="h-9 w-9 rounded-full bg-white/80 backdrop-blur-sm border-none shadow-sm hover:bg-white" onClick={() => setIsDetailsOpen(false)}>
+                         <XCircle className="h-5 w-5 text-slate-600" />
                       </Button>
                    </div>
                 </div>
